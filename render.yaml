@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: instagram-video-telegram-bot
+    runtime: docker
+    plan: free
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
