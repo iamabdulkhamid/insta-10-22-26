@@ -1,66 +1,76 @@
-# Instagram → Telegram video bot
+# Bitta universal Telegram bot — Instagram / Pinterest / TikTok / YouTube Shorts
 
-BotFather tokeni bilan Instagram'ning **hammaga ochiq** Reel va video postlarini Telegram chatga yuklaydigan shaxsiy bot. Instagram akkaunt paroli kerak emas. Video Instagram tomonidan cheklansa, **har bir havola ishlashi kafolatlanmaydi**.
+Bu ZIP oldin 97 MiB atrofida videoni MTProto orqali yuborgan
+`iamabdulkhamid/insta-10-22-26` Render botining **yangilash versiyasi**.
+Mavjud BotFather boti va Render servisini saqlab qolish mumkin.
 
-## 1. BotFather'dan token oling
+## Imkoniyatlar
 
-1. Telegram'da `@BotFather` ni oching.
-2. `/newbot` yozing, bot nomi va `...bot` bilan tugaydigan username tanlang.
-3. Berilgan tokenni maxfiy saqlang. **Tokenni GitHub'ga yoki ommaviy chatga joylamang.**
+- Instagram: **Reels**, oddiy **video post**, rasmli post va karusel; **videodagi audioni MP3** qilib ajratish.
+- Pinterest: bitta pin rasmi yoki videosi; pin ichidagi mavjud media.
+- TikTok: umumiy ko‘rinadigan video.
+- YouTube: **Shorts** havolasidagi video va ixtiyoriy MP3.
+- Foydalanuvchi link yuboradi va **Video / MP3 / Rasmlar / Hammasi** tugmalaridan birini tanlaydi.
+  Platformaga qarab tegishli tugmalar chiqadi. Bot ishlatayotgan paytda yangi so‘rov uchun **«band»** deydi —
+  Render Free'dagi 512 MB RAM'ni ortiqcha yuklamaslik uchun.
+- Katta fayllar eski ishlayotgan MTProto yo‘li orqali; kichik fayllar Telegram Bot API orqali.
+- Vaqtinchalik fayllar har bir operatsiya tugagandan keyin `TemporaryDirectory` orqali o‘chiriladi.
+- `/id` va `ALLOWED_USER_IDS` funksiyalari saqlangan. Port `/telegram`, `GET /` va `HEAD /` tayyor.
 
-## 2. Render Free'ga joylash (tavsiya etilgan)
+## O‘rnatish — eski botni saqlab qolamiz
 
-1. Shu papkadagi fayllarni yangi **private GitHub repository** ga yuklang. `render.yaml` ham bo'lsin.
-2. Render Dashboard → **New → Blueprint** → GitHub repository ni tanlang.
-3. `BOT_TOKEN` so'ralganda BotFather tokenini maxfiy qiymat sifatida kiriting.
-4. Deploy tugaganda Render loglarida `Telegram webhook registered: https://.../telegram` yozuvini tekshiring.
-5. Telegram'da botni oching → **Start** → ochiq `https://www.instagram.com/reel/.../` link yuboring.
+1. ZIP faylni **oching**. Ichidagi `main.py`, `media_tools.py`, `platform_urls.py`,
+   `instagram_urls.py`, `requirements.txt`, `Dockerfile`, `render.yaml`, `local_bot.py`
+   va boshqa `.py`/`.md` fayllarni GitHub repozitoriyangiz **asosiy (root) papkasiga** joylang.
+2. GitHub -> `https://github.com/iamabdulkhamid/insta-10-22-26` -> `Add file` ->
+   `Upload files` -> barcha fayllarni yuklang, eski `main.py`, `requirements.txt`, `Dockerfile`
+   bilan **almashtiring** -> `Commit changes`.
+3. Render -> mavjud Web Service -> **Environment**:
+   - `BOT_TOKEN` — BotFather tokeni, **maxfiy**.
+   - `API_ID` va `API_HASH` — my.telegram.org bergan ma’lumotlar, **maxfiy**.
+   - `MAX_VIDEO_SIZE_MB` — dastlab `200` qoldirish tavsiya qilinadi.
+   - `ALLOWED_USER_IDS` — ixtiyoriy, faqat o‘zingiz va oilangiz (masalan `123456789,987654321`).
+4. Render -> `Events`: yangi deploy muvaffaqiyatli tugaganini tekshiring.
+   Avtomatik deploy bo‘lmasa, `Manual Deploy` -> `Deploy latest commit`.
+5. Telegram'da `/start` yuboring, so‘ng bittadan Instagram / Pinterest / TikTok / YouTube Shorts ochiq havolasini yuborib,
+   tegishli tugmalarni sinang.
 
-Render `RENDER_EXTERNAL_URL` muhit o'zgaruvchisini o'zi beradi; URLni qo'lda kiritish shart emas. `Dockerfile` ffmpeg'ni o'rnatadi. `render.yaml` `free` web service ni yaratadi. Bu **haqiqiy botni avtomatik deploy qilmaydi**: uni GitHub va Render akkauntingizga siz ulashingiz kerak.
+**MUHIM xavfsizlik:** Eski suhbatda Render loglaridan `BOT_TOKEN` ochiq chiqib ketgan edi.
+Uni `@BotFather` orqali **revoke/regenerate** qilib, yangi tokenni faqat Render Environment'ga kiriting.
+Bot tokenini GitHub'ga, README'ga yoki loglarga joylamang.
+`httpx` INFO logi o‘chirildi: u aks holda tokenli Telegram URLlarini chiqarishi mumkin.
 
-**Bepul Render cheklovi:** xizmatga 15 daqiqa kiruvchi so'rov bo'lmasa server uxlaydi. Telegram webhook xabari serverni uyg'otishi mumkin, ammo dastlabki javob kechikishi yoki ba'zan Telegram qayta urinishi mumkin. 24/7 kafolatli ishlashi uchun doim faol server/paid hosting kerak.
+## Amaliy cheklovlar
 
-## 3. Faqat o'zingiz va oila a'zolaringiz uchun (ixtiyoriy)
+- Yuqoridagi platformalarning qoidalari, loginga ehtiyoj, DRM, botga qarshi himoya yoki hududiy bloklash sababli ayrim havolalar ishlamasligi mumkin.
+- YouTube Shorts uchun `yt-dlp`ga qo‘shimcha `Deno` JavaScript runtime kerak. Dockerfile uni build paytida o‘rnatishga **urinadi**.
+  O‘rnatish ishlamasa, ayrim Shorts'lar ochilmaydi.
+- Instagram karusellar va Pinterest rasmlari `gallery-dl` orqali olinadi.
+  Instagram o‘zgarsa, shu kutubxonani yangilash talab qilinishi mumkin.
+- **MP3 — bu videoning ovozi**, alohida to‘liq qo‘shiqni qidirib beruvchi servis emas.
+- Hajm limiti 200 **MiB** (taxminan 210 MB) bo‘lib, u `MAX_VIDEO_SIZE_MB` orqali belgilanadi.
+  Telegram Bot API orqali yuborishda 48 MiB xavfsizlik chegarasi ishlatiladi.
+  2 GB katta fayllar Render Free'da sinovdan o‘tmagan; ilgari 97 MB video muvaffaqiyatli yuborilgan.
+- Shu ZIP'ni ishlab chiqqanda URL-parser testlari va kod sintaksisi tekshiriladi.
+  **Haqiqiy TikTok, Pinterest, YouTube Shorts va Instagram rasm postlari uchun jonli server sinovi o'tkazilmagan.**
+- Faqat ommaga ochiq yoki saqlashga ruxsatingiz bor kontentdan foydalaning.
 
-1. Botda `/id` yozing; Telegram ID raqamingiz chiqadi.
-2. Oila a'zongiz ham botga `/id` yuborsin.
-3. Render → servis → **Environment** ga `ALLOWED_USER_IDS` degan qiymat qo'shing. Masalan: `123456789,987654321` (haqiqiy IDlarni yozing).
-4. **Save, deploy** qiling. Endi faqat shu IDlar video yuklay oladi.
+## Sozlash / nosozlik
 
-## 4. Kompyuterda sinash (Render'siz)
+- Yuklash tugmalari ishlamasa: Render Logs va `allowed_updates=["message", "callback_query"]` kodiga qarang.
+- `ModuleNotFoundError`: GitHub'dagi `requirements.txt`ni yangi versiyaga almashtirganingizni tekshiring.
+- Video yuborilmasa: `Render Logs`dagi so‘nggi xatoni (tokenni berkitib) tekshiring.
+- Render Free uyqu rejimiga o‘tganda dastlabki javob kechikishi mumkin.
+- Yangi versiya ishlamasa, Render -> Events orqali oldingi ishlab turgan versiyaga **rollback** qilish yoki GitHub'ning oldingi commitiga qaytish mumkin.
 
-Python 3.11+ va `ffmpeg` o'rnatilgan bo'lsin.
+## Lokal testlar
 
-```bash
-pip install -r requirements.txt
+```shell
+python -m unittest discover -v
+python -m py_compile main.py media_tools.py platform_urls.py
 ```
 
-Windows PowerShell:
-```powershell
-$env:BOT_TOKEN="BOTFATHER_TOKENINGIZ"
-python local_bot.py
-```
+## Texnologiya
 
-Linux/macOS:
-```bash
-export BOT_TOKEN="BOTFATHER_TOKENINGIZ"
-python local_bot.py
-```
-
-Bir vaqtning o'zida Render webhook varianti va kompyuterdagi polling variantini ishlatmang. Kompyuterdagi bot faqat terminal ochiq va internet mavjud bo'lganda javob beradi.
-
-## Buyruqlar va cheklovlar
-
-- `/start` — ishga tushirish
-- `/id` — Telegram user ID ni ko'rish
-- Instagram Reel (`/reel/`), post (`/p/`), video (`/tv/`) havolalari qabul qilinadi. Post faqat foto bo'lsa video chiqmaydi.
-- Private account video yuklanmaydi.
-- Telegram Bot API limitiga mos ravishda 48 MiB gacha videolar yuboriladi.
-- Faqat yuklab olish huquqingiz bo'lgan kontentdan foydalaning.
-
-### Nosozliklarni aniqlash
-
-- **Bot javob bermasa**: Render → service → Logs → `Telegram webhook registered` qatorini tekshiring, BotFather tokenini va Deploy holatini tekshiring.
-- **Video yuklanmasa**: boshqa ochiq Reel link bilan sinang; Instagram IP yoki autentifikatsiya cheklovi bo'lishi mumkin.
-- **403**: Telegram webhook uchun sirli sarlavha avtomatik tekshiriladi; qo'lda webhook endpointiga POST so'rovi yubormang.
-- **Boshqa xizmatda deploy**: `PUBLIC_URL=https://sizning-https-domeningiz` o'rnating va `uvicorn main:api --host 0.0.0.0 --port 10000` bilan ishga tushiring.
+`python-telegram-bot` webhook, `yt-dlp[default]` video, `gallery-dl` rasmlar,
+`ffmpeg` MP3, `Telethon` MTProto, `FastAPI` / `uvicorn`, `Deno` YouTube EJS.
