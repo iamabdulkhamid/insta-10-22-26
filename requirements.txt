@@ -2,3 +2,4 @@ python-telegram-bot>=22.5,<23
 yt-dlp>=2025.1
 fastapi>=0.115,<1
 uvicorn>=0.34,<1
+Telethon>=1.40,<2
