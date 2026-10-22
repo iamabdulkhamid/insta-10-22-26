@@ -142,8 +142,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "🔗 Instagram Reels/post, Pinterest pin, TikTok video yoki YouTube Shorts linkini yuboring.\n"
         "Keyin Video, MP3, Rasmlar yoki Hammasi tugmasini tanlang.\n\n"
         "🎵 MP3 — videodagi ovoz, qo‘shiqning to‘liq nusxasi emas.\n"
-        f"📦 Bitta fayl chegarasi: {MAX_VIDEO_MIB} MiB (katta fayl MTProto orqali).\n"
-        "ℹ️ Faqat hammaga ochiq va yuklashga ruxsatli materiallar. /id — ID raqamingiz."
     )
 
 
